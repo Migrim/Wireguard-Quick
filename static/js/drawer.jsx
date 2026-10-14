@@ -231,7 +231,7 @@ function DnsActivity({ peer, onPeerUpdated }) {
                   <li key={i} className="dns-item">
                     <span className="dns-rank"><span className="skel" style={{ width: 12, height: 9 }} /></span>
                     <span className="dns-name"><span className="skel" style={{ width: `${76 - ((i * 23) % 42)}%` }} /></span>
-                    <span className="dns-bar-wrap"><span className="skel" style={{ display: 'block', width: `${Math.max(10, 85 - i * 17)}%`, height: 6, borderRadius: 99 }} /></span>
+                    <span className="dns-bar-wrap"><span className="skel" style={{ display: 'block', width: `${Math.max(10, 85 - i * 17)}%`, height: 6, borderRadius: 0 }} /></span>
                     <span className="dns-count"><span className="skel" style={{ width: 26, height: 9 }} /></span>
                   </li>
                 ))}
@@ -343,7 +343,7 @@ function PeerQrModal({ peer, onClose }) {
 // ============================================================
 // PeerDrawer — slide-out detail with charts + controls
 // ============================================================
-function PeerDrawer({ peer, onClose, throughputBuffers, peerPingHistory = {}, onRevoke, onPeerUpdated, tweaks = {} }) {
+function PeerDrawer({ peer, onClose, throughputBuffers, peerPingHistory = {}, onRevoke, onPeerUpdated, tweaks = {}, onOpenBudget }) {
   const [qrOpen, setQrOpen] = _useState(false);
   const [copied, setCopied] = _useState('');
   const [downloading, setDownloading] = _useState(false);
@@ -505,7 +505,7 @@ function PeerDrawer({ peer, onClose, throughputBuffers, peerPingHistory = {}, on
 
         {tab === 'settings' ? (
           <div className="drawer-body">
-            <window.PeerSettings peer={peer} onDirtyChange={setSettingsDirty} onPeerUpdated={onPeerUpdated} />
+            <window.PeerSettings peer={peer} onDirtyChange={setSettingsDirty} onPeerUpdated={onPeerUpdated} onOpenBudget={onOpenBudget} />
           </div>
         ) : tab === 'activity' ? (
           <div className="drawer-body">
@@ -657,7 +657,7 @@ function PeerDrawer({ peer, onClose, throughputBuffers, peerPingHistory = {}, on
               </button>
             </div>
             {peer.paused && (
-              <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 6, background: 'color-mix(in oklch, var(--warn) 12%, transparent)', color: 'var(--warn)', fontFamily: 'var(--mono)', fontSize: 11 }}>
+              <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 0, background: 'color-mix(in oklch, var(--warn) 12%, transparent)', color: 'var(--warn)', fontFamily: 'var(--mono)', fontSize: 11 }}>
                 Peer is paused — traffic is blocked server-side. The device tunnel may still show as connected.
               </div>
             )}
@@ -2016,7 +2016,6 @@ function SettingsDrawer({ tweaks, setTweaks, onClose, onUpdateAvailable }) {
   const onCooldown = remaining > 0;
   const [advancedOpen, setAdvancedOpen] = _useState(false);
   const [chartFineOpen, setChartFineOpen] = _useState(false);
-  const [softColorsFineOpen, setSoftColorsFineOpen] = _useState(false);
   const devUpdatesRef = _useRef(tweaks.devUpdates);
   devUpdatesRef.current = tweaks.devUpdates;
   const prevDevUpdatesRef = _useRef(tweaks.devUpdates);
@@ -2197,63 +2196,6 @@ function SettingsDrawer({ tweaks, setTweaks, onClose, onUpdateAvailable }) {
                   <span className="set-accent-name">{a.name}</span>
                 </button>
               ))}
-            </div>
-            <div className="settings-list" style={{ marginTop: '10px' }}>
-              <div className="setting-row">
-                <div className="setting-row-main">
-                  <span className="soft-preview" aria-hidden="true">
-                    <span className="soft-preview-swatch soft-preview-before" />
-                    <span className="soft-preview-swatch soft-preview-after" />
-                  </span>
-                  <div>
-                    <div className="setting-title">Soft colors</div>
-                    <div className="setting-desc">Warm cream / charcoal surfaces instead of plain white</div>
-                  </div>
-                </div>
-                <div className="setting-control" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <button
-                    className="chart-fine-toggle"
-                    onClick={() => setSoftColorsFineOpen(v => !v)}
-                    aria-expanded={softColorsFineOpen}
-                    title="Fine-tune accent tinting"
-                  >
-                    Customize
-                    <svg style={{ transform: softColorsFineOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
-                  </button>
-                  <button
-                    className={`toggle ${tweaks.softColors ? 'on' : ''}`}
-                    onClick={() => setTweaks({ ...tweaks, softColors: !tweaks.softColors })}
-                    aria-pressed={!!tweaks.softColors}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Accent tint — independent of soft colors, so it works on plain
-                  surfaces or warm ones, in light or dark mode. Collapsed by
-                  default, opened via the Customize toggle above. */}
-              <div className={`collapse-rows${softColorsFineOpen ? ' open' : ''}`}>
-                <div>
-                  <div className="chart-fine-list">
-                    <div className="setting-row">
-                      <div>
-                        <div className="setting-title">Accent tint</div>
-                        <div className="setting-desc">Text, numbers and icons pick up shades of your accent color, in both light and dark mode. Backgrounds, containers and input fields stay neutral.</div>
-                      </div>
-                      <div className="setting-control">
-                        <button
-                          className={`toggle ${tweaks.accentTint ? 'on' : ''}`}
-                          onClick={() => setTweaks({ ...tweaks, accentTint: !tweaks.accentTint })}
-                          aria-pressed={!!tweaks.accentTint}
-                        >
-                          <span className="toggle-knob" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </section>
 

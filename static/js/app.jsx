@@ -793,6 +793,7 @@ function App({ tweaks, setTweaks, onLogout }) {
           tweaks={tweaks}
           onRevoke={refreshPeers}
           onPeerUpdated={refreshPeers}
+          onOpenBudget={() => { setSelectedPeer(null); setDataDrawerOpen(true); }}
         />
       )}
 
@@ -833,6 +834,7 @@ function App({ tweaks, setTweaks, onLogout }) {
         <AddPeerDrawer
           peers={peers}
           onClose={() => setAddOpen(false)}
+          onOpenBudget={() => { setAddOpen(false); setDataDrawerOpen(true); }}
           onCreated={() => {
             window.WG.apiCall('/api/status', { silent: true }).then(j => {
               const mapped = window.WG.mapApiPeers(j.clients.issued, j.clients.live);

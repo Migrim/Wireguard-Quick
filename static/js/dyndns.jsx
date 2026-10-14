@@ -20,7 +20,6 @@ const DYNDNS_PROVIDERS = [
     tokenLabel: 'Credentials',
     domainLabel: 'Hostname',
     domainPh: 'myhome.ddns.net',
-    disabled: true,
   },
   {
     id: 'dynu',
@@ -31,7 +30,6 @@ const DYNDNS_PROVIDERS = [
     tokenLabel: 'Credentials',
     domainLabel: 'Hostname',
     domainPh: 'myhome.freeddns.org',
-    disabled: true,
   },
   {
     id: 'custom',
@@ -288,8 +286,8 @@ function DynDNSDrawer({ onClose }) {
         <div className="drawer-body">
           {loading ? (
             <section className="drawer-section">
-              <div className="skel" style={{ height: 96, width: '100%', borderRadius: 12 }} />
-              <div className="skel" style={{ height: 60, width: '100%', borderRadius: 8, marginTop: 24 }} />
+              <div className="skel" style={{ height: 96, width: '100%', borderRadius: 0 }} />
+              <div className="skel" style={{ height: 60, width: '100%', borderRadius: 0, marginTop: 24 }} />
             </section>
           ) : (
             <>

@@ -26,7 +26,7 @@ function normalizeEndpoint(ep) {
   return ep && ep.includes(':') ? ep : 'vpn.example.com:51820';
 }
 
-function PeerSettings({ peer, onDirtyChange, onPeerUpdated }) {
+function PeerSettings({ peer, onDirtyChange, onPeerUpdated, onOpenBudget }) {
   const seeds = pM(() => ({
     routingPreset: routingPresetFromAllowedIps(peer.clientAllowedIps),
     allowedIps: peer.clientAllowedIps || '0.0.0.0/0, ::/0',
@@ -106,9 +106,6 @@ function PeerSettings({ peer, onDirtyChange, onPeerUpdated }) {
   const [expiry, setExpiry] = pS('never');
   const [disableIdle, setDisableIdle] = pS(false);
   const [idleDays, setIdleDays] = pS('30');
-  const [dataCap, setDataCap] = pS('');
-  const [rateDown, setRateDown] = pS('');
-  const [rateUp, setRateUp] = pS('');
 
   // Saved baseline for dirty detection
   function snapshotConfig(src) {
@@ -575,24 +572,10 @@ function PeerSettings({ peer, onDirtyChange, onPeerUpdated }) {
     );
     if (id === 'bw') return (
       <>
-        <div className="ap2-field">
-          <label className="ap-label">Monthly data cap <span className="ap-label-opt">GB · blank = unlimited</span></label>
-          <input type="text" className="ap-input mono" value={dataCap}
-            onChange={(e) => setDataCap(e.target.value)} placeholder="unlimited" style={{ maxWidth: 160 }} />
+        <div className="ap2-help" style={{ color: 'var(--muted)', marginBottom: 10 }}>
+          Data caps and throttling for {peer.name} live in the dashboard's Data Budget panel, alongside every other peer's usage.
         </div>
-        <div className="ap2-mini-grid c2">
-          <div className="ap2-field">
-            <label className="ap-label">Rate limit ↓ <span className="ap-label-opt">Mbps</span></label>
-            <input type="text" className="ap-input mono" value={rateDown}
-              onChange={(e) => setRateDown(e.target.value)} placeholder="—" />
-          </div>
-          <div className="ap2-field">
-            <label className="ap-label">Rate limit ↑ <span className="ap-label-opt">Mbps</span></label>
-            <input type="text" className="ap-input mono" value={rateUp}
-              onChange={(e) => setRateUp(e.target.value)} placeholder="—" />
-          </div>
-        </div>
-        <div className="ap2-help" style={{ color: 'var(--muted)' }}>Per-peer shaping via tc — coming soon.</div>
+        <button type="button" className="btn" onClick={() => onOpenBudget?.()}>Open Data Budget →</button>
       </>
     );
     return null;
@@ -600,10 +583,9 @@ function PeerSettings({ peer, onDirtyChange, onPeerUpdated }) {
 
   const instantSections = [
     {
-      id: 'meta', icon: ICN.tag, title: 'Tags & metadata',
+      id: 'meta', icon: ICN.tag, title: 'Notes & owner',
       summary: (note ? `"${note.slice(0, 22)}${note.length > 22 ? '…' : ''}"` : 'no note') + (owner ? ` · ${owner}` : ''),
       modified: note !== seeds.note || owner !== seeds.owner || longNote !== seeds.longNote,
-      comingSoon: true,
     },
     {
       id: 'life', icon: ICN.clock, title: 'Lifecycle & expiry',
@@ -613,9 +595,8 @@ function PeerSettings({ peer, onDirtyChange, onPeerUpdated }) {
     },
     {
       id: 'bw', icon: ICN.gauge, title: 'Bandwidth & quotas',
-      summary: (dataCap ? `${dataCap} GB / mo` : 'unlimited data') + (rateDown || rateUp ? ' · shaped' : ''),
-      modified: !!(dataCap || rateDown || rateUp),
-      comingSoon: true,
+      summary: 'set in Data Budget',
+      modified: false,
     },
   ];
 

@@ -8,13 +8,12 @@
 <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
   (() => {
     try {
       const th = localStorage.getItem('WG_THEME');
       if (th === 'dark' || th === 'light') document.documentElement.setAttribute('data-theme', th);
-      if (localStorage.getItem('WG_SOFT_COLORS') === 'true') document.documentElement.classList.add('soft-colors');
     } catch (e) {}
   })();
 </script>
@@ -72,17 +71,6 @@
   --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.3);
   --shadow-lg: 0 2px 4px rgba(0,0,0,0.4), 0 30px 80px rgba(0,0,0,0.6);
 }
-.soft-colors {
-  --bg: #F5EEE2; --bg-2: #EFE7D8; --card: #FBF6EC; --card-raised: #FFFCF4;
-  --ink: #2A2520; --ink-2: #4A4238; --muted: #8A7F72; --muted-2: #A89C8C;
-  --border: #E6DCC8; --border-strong: #D6C9B0;
-}
-[data-theme="dark"].soft-colors {
-  --bg: #14100C; --bg-2: #1C1611; --card: #241D16; --card-raised: #2F2619;
-  --ink: #EFE6D8; --ink-2: #C8BEAE; --muted: #8A7F72; --muted-2: #6B6256;
-  --border: #3A2F24; --border-strong: #4D3E2C;
-}
-
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
 body {
@@ -132,7 +120,7 @@ body {
   width: 38px; height: 38px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 0;
   display: grid; place-items: center;
   color: var(--accent);
   box-shadow: var(--shadow-sm);
@@ -148,7 +136,7 @@ body {
 .steps { display: flex; flex-direction: column; gap: 1px; flex: 1; }
 .step {
   display: flex; align-items: center; gap: 11px;
-  padding: 9px 10px; border-radius: 9px;
+  padding: 9px 10px; border-radius: 0;
   cursor: pointer; color: var(--muted);
   border: 1px solid transparent;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
@@ -176,7 +164,7 @@ body {
 .rail-status .live-dot { animation: none; box-shadow: none; }
 .theme-btn {
   width: 28px; height: 28px; display: grid; place-items: center;
-  background: var(--card); border: 1px solid var(--border); border-radius: 7px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 0;
   cursor: pointer; color: var(--muted); transition: all 0.12s;
 }
 .theme-btn:hover { color: var(--ink); border-color: var(--border-strong); }
@@ -197,7 +185,7 @@ body {
 .stage {
   background: var(--bg-2);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 0;
   box-shadow: var(--shadow-sm);
   padding: 20px;
   height: 360px;
@@ -219,14 +207,14 @@ body {
 }
 .dots { display: flex; gap: 7px; }
 .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); transition: all 0.25s; cursor: pointer; }
-.dots i.on { background: var(--accent); width: 22px; border-radius: 4px; }
+.dots i.on { background: var(--accent); width: 22px; border-radius: 0; }
 .foot-btns { display: flex; gap: 9px; }
 .btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 0 16px; height: 38px;
   font-family: var(--sans); font-size: 13px; font-weight: 500;
   color: var(--ink); background: var(--card); border: 1px solid var(--border);
-  border-radius: 9px; cursor: pointer; transition: all 0.12s; box-shadow: var(--shadow-sm);
+  border-radius: 0; cursor: pointer; transition: all 0.12s; box-shadow: var(--shadow-sm);
 }
 .btn:hover { background: var(--card-raised); border-color: var(--border-strong); }
 .btn-ghost { background: transparent; box-shadow: none; border-color: transparent; color: var(--muted); }
@@ -240,13 +228,13 @@ body {
 ============================================================ */
 .sc-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
 .sc-shield {
-  align-self: center; width: 64px; height: 64px; border-radius: 18px;
+  align-self: center; width: 64px; height: 64px; border-radius: 0;
   display: grid; place-items: center; color: var(--accent);
   background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
   position: relative;
 }
 .sc-shield::after {
-  content: ""; position: absolute; inset: -6px; border-radius: 22px;
+  content: ""; position: absolute; inset: -6px; border-radius: 0;
   border: 2px solid var(--accent); opacity: 0;
 }
 .playing .sc-shield::after { animation: scRing 1.2s ease-out 1.6s; }
@@ -255,7 +243,7 @@ body {
 .sc-row {
   display: flex; align-items: center; gap: 11px;
   padding: 11px 14px; background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; font-size: 12.5px; color: var(--ink-2);
+  border-radius: 0; font-size: 12.5px; color: var(--ink-2);
   opacity: 0; transform: translateY(6px);
 }
 .playing .sc-row { animation: scRowIn 0.4s ease forwards; }
@@ -287,7 +275,7 @@ body {
 .chart-unit { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 .chart-legend { display: flex; gap: 14px; }
 .lg { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-.lg i { width: 8px; height: 8px; border-radius: 2px; }
+.lg i { width: 8px; height: 8px; border-radius: 0; }
 .chart-svg { flex: 1; align-self: stretch; min-width: 0; margin: 0 -20px -20px; }
 .chart-reveal { clip-path: inset(0 100% 0 0); }
 .playing .chart-reveal { animation: chartReveal 1.6s cubic-bezier(0.4,0,0.1,1) forwards; }
@@ -302,7 +290,7 @@ body {
 .pr-list { display: flex; flex-direction: column; gap: 9px; flex: 1; justify-content: center; }
 .pr-row {
   display: grid; grid-template-columns: 10px 32px 1fr; gap: 12px; align-items: center;
-  padding: 11px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 11px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 0;
   opacity: 0; transform: translateX(-8px);
 }
 .playing .pr-row { animation: prIn 0.45s cubic-bezier(0.2,0.9,0.3,1) forwards; }
@@ -311,7 +299,7 @@ body {
 .playing .pr-row:nth-child(3) { animation-delay: 0.4s; }
 .playing .pr-row:nth-child(4) { animation-delay: 0.55s; }
 @keyframes prIn { to { opacity: 1; transform: none; } }
-.pr-av { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-family: var(--mono); font-size: 11px; font-weight: 600; }
+.pr-av { width: 32px; height: 32px; border-radius: 0; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-family: var(--mono); font-size: 11px; font-weight: 600; }
 .pr-off .pr-av { background: var(--bg-2); color: var(--muted); }
 .pr-name { font-size: 12.5px; font-weight: 500; color: var(--ink); }
 .pr-dev { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 1px; }
@@ -328,7 +316,7 @@ body {
 .adev-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
 .qr {
   width: 132px; height: 132px; padding: 9px; background: #fff; border: 1px solid var(--border);
-  border-radius: 12px; box-shadow: var(--shadow); display: grid; gap: 0;
+  border-radius: 0; box-shadow: var(--shadow); display: grid; gap: 0;
   grid-template-columns: repeat(21, 1fr); grid-template-rows: repeat(21, 1fr);
 }
 .qr i { background: transparent; border-radius: 0; }
@@ -337,7 +325,7 @@ body {
 .dv-side { display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: stretch; }
 .dv-cfg {
   font-family: var(--mono); font-size: 10.5px; line-height: 1.65; color: var(--ink-2);
-  background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 0; padding: 11px 13px;
 }
 .dv-cfg .ln { display: block; white-space: nowrap; opacity: 0; }
 .dv-cfg .k { color: var(--muted); }
@@ -374,17 +362,17 @@ body {
    DEMO 5 — budgets & alerts
 ============================================================ */
 .ba-wrap { flex: 1; display: flex; flex-direction: column; gap: 16px; justify-content: center; }
-.ba-budget { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px 16px; }
+.ba-budget { background: var(--card); border: 1px solid var(--border); border-radius: 0; padding: 15px 16px; }
 .ba-budget-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
 .ba-num { display: flex; align-items: baseline; gap: 4px; }
 .ba-big { font-family: var(--serif); font-size: 30px; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .ba-unit { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 .ba-cap { font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
-.ba-bar { height: 9px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
-.ba-fill { height: 100%; width: 0; border-radius: 5px 0 0 5px; background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 80%, var(--accent-2)), var(--accent)); }
+.ba-bar { height: 9px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 0; overflow: hidden; }
+.ba-fill { height: 100%; width: 0; border-radius: 0; background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 80%, var(--accent-2)), var(--accent)); }
 .playing .ba-fill { animation: baFill 1.3s cubic-bezier(0.3,0.9,0.3,1) 0.3s forwards; }
 @keyframes baFill { to { width: 64%; } }
-.ba-alert { display: flex; gap: 10px; align-items: flex-start; padding: 11px 13px; border-radius: 10px; opacity: 0; transform: translateY(8px); }
+.ba-alert { display: flex; gap: 10px; align-items: flex-start; padding: 11px 13px; border-radius: 0; opacity: 0; transform: translateY(8px); }
 .ba-warn { background: var(--warn-soft); border: 1px solid color-mix(in oklab, var(--warn) 25%, var(--border)); }
 .ba-info { background: var(--card); border: 1px solid var(--border); }
 .playing .ba-alert { animation: scRowIn 0.45s ease forwards; }
@@ -402,7 +390,7 @@ body {
 .recap { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 9px; }
 .recap-item {
   display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 0;
   opacity: 0; transform: scale(0.95);
 }
 .playing .recap-item { animation: rcIn 0.4s cubic-bezier(0.2,0.9,0.3,1) forwards; }
@@ -413,7 +401,7 @@ body {
 .playing .recap-item:nth-child(5) { animation-delay: 0.33s; }
 .playing .recap-item:nth-child(6) { animation-delay: 0.40s; }
 @keyframes rcIn { to { opacity: 1; transform: none; } }
-.recap-ico { width: 30px; height: 30px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex-shrink: 0; }
+.recap-ico { width: 30px; height: 30px; border-radius: 0; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex-shrink: 0; }
 .recap-t { font-size: 12px; font-weight: 500; color: var(--ink); }
 .recap-d { font-family: var(--mono); font-size: 9.5px; color: var(--muted); margin-top: 1px; }
 
@@ -446,6 +434,7 @@ body {
   .main-foot { padding: 14px 22px 18px; }
 }
 </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/onauth-theme.css') }}">
 </head>
 <body>
 <div class="oobe" id="oobe">
@@ -595,8 +584,8 @@ const STEPS = [
   { nav: "Welcome", kicker: "Installation complete", title: "WireGuard is <em>up and running</em>", desc: "WG-Quick is already fully set up for you. This quick tour walks through the main features — or skip straight to the dashboard to start adding your first peer.", list: [], tag: "Status check" },
   { nav: "Live traffic", kicker: "Live throughput chart", title: "Watch traffic live!", desc: "The live throughput chart streams inbound and outbound traffic for all connected peers in real time. Filter the view to the last 10s, 30s, 1m, 5m, 12h, or 24h, and customize the chart to your liking in the dashboard settings.", list: ["Inbound & outbound on one chart", "10s / 30s / 1m / 5m / 12h / 24h ranges", "Clean animations"], tag: "Live" },
   { nav: "Your peers", kicker: "Devices on the tunnel", title: "Every device, <em>at a glance</em>", desc: "The peer table shows a live sparkline, tunnel IP, in and out bytes, and current connection state for every device. Open the peer drawer for ping, geo location, and more detail.", list: ["Live sparkline, IP & byte counts", "Connected state at a glance", "Open the drawer for ping & geo"], tag: "14 peers" },
-  { nav: "Add a device", kicker: "Onboarding in seconds", title: "Add a new peer <em>in seconds</em>", desc: "Adding a peer takes seconds and you never have to touch the command line. Download the ready-made .conf file for a laptop, or scan the QR code straight into the WireGuard app on your phone — keys, routing, and DNS are all configured for you.", list: ["Add a peer in one click", "Advanced settings when you need them"], tag: "New peer" },
-  { nav: "Traffic map", kicker: "Where your peers are", title: "Live <em>Traffic Map</em>", desc: "Open Traffic Map to watch connected devices orbit your server — each peer shows its handshakes, rx, and geo location as text. Peers drift closer to the hub when ping is good and further out when it's bad, so latency is visible at a glance.", list: ["Handshakes, rx & geo per peer", "Distance shows ping quality"], tag: "Worldwide" },
+  { nav: "Add a device", kicker: "Onboarding in seconds", title: "Add a new peer <em>in seconds</em>", desc: "Adding a peer takes seconds and you never have to touch the command line. Download the ready-made .conf file for a laptop, or scan the QR code straight into the WireGuard app on your phone — keys, routing, and DNS are all configured for you.", list: ["Add a peer in one click", "DNS & connection tuning when you need them"], tag: "New peer" },
+  { nav: "Traffic map", kicker: "Where your peers are", title: "Live <em>Traffic Map</em> <span style=\"font-size:0.5em;font-family:var(--mono);color:var(--muted);vertical-align:middle\">experimental</span>", desc: "Open Traffic Map to watch connected devices orbit your server — each peer shows its handshakes, rx, and geo location as text. Peers drift closer to the hub when ping is good and further out when it's bad, so latency is visible at a glance. Still early — turn it on from Settings.", list: ["Handshakes, rx & geo per peer", "Distance shows ping quality"], tag: "Worldwide" },
   { nav: "Budgets & alerts", kicker: "Stay in control", title: "Caps, alerts, <em>and a log</em>", desc: "Set daily data budgets per peer and automatically throttle or disconnect them when limits are exceeded. Get notifications about your VPN node health, backed by a fully implemented event log and updater.", list: ["Per-peer daily budgets", "Auto throttle or disconnect", "Node health alerts, log & updater"], tag: "Notifications" },
   { nav: "You're all set", kicker: "Ready to go", title: "That's the <em>whole dashboard</em>", desc: "You've seen the essentials. Jump in whenever you're ready — every feature here is one click away from the main view.", list: [], tag: "Done" },
 ];

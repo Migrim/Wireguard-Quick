@@ -164,11 +164,10 @@ const PRESET_DEFAULTS = {
   endpoint: `${window.location.hostname}:51820`, mtu: '1420', keepalive: '25', listenPort: '',
   preUp: '', postUp: '', preDown: '', postDown: '', table: 'auto', fwmark: '',
   expiry: 'never', disableIdle: false, idleDays: '30',
-  dataCap: '', rateDown: '', rateUp: '',
   owner: '', notes: '',
 };
 
-function AddPeerDrawer({ peers, onClose, onCreated }) {
+function AddPeerDrawer({ peers, onClose, onCreated, onOpenBudget }) {
   const [created, setCreated] = aS(false);
   const [serverProfile, setServerProfile] = aS('');
   const [openSection, setOpenSection] = aS({});
@@ -201,10 +200,6 @@ function AddPeerDrawer({ peers, onClose, onCreated }) {
   const [expiry, setExpiry] = aS('never');
   const [disableIdle, setDisableIdle] = aS(false);
   const [idleDays, setIdleDays] = aS('30');
-  // pro: bandwidth
-  const [dataCap, setDataCap] = aS('');
-  const [rateDown, setRateDown] = aS('');
-  const [rateUp, setRateUp] = aS('');
   // pro: metadata
   const [owner, setOwner] = aS('');
   const [tags, setTags] = aS([]);
@@ -326,9 +321,8 @@ function AddPeerDrawer({ peers, onClose, onCreated }) {
     },
     {
       id: 'bw', icon: I.gauge, title: 'Bandwidth & quotas',
-      summary: (dataCap ? `${dataCap} GB / mo` : 'unlimited data') + (rateDown || rateUp ? ' · shaped' : ''),
-      modified: !!(dataCap || rateDown || rateUp),
-      comingSoon: true,
+      summary: 'set after creation',
+      modified: false,
     },
     {
       id: 'meta', icon: I.tag, title: 'Tags & metadata',
@@ -571,20 +565,10 @@ function AddPeerDrawer({ peers, onClose, onCreated }) {
 
     if (id === 'bw') return (
       <>
-        <div className="ap2-field">
-          <label className="ap-label">Monthly data cap <span className="ap-label-opt">GB · blank = unlimited</span></label>
-          <input type="text" className="ap-input mono" value={dataCap} onChange={(e) => setDataCap(e.target.value)} placeholder="unlimited" style={{ maxWidth: 160 }} />
+        <div className="ap2-help" style={{ color: 'var(--muted)', marginBottom: 10 }}>
+          Data caps and throttling are set per-peer in the dashboard's Data Budget panel, once this peer exists.
         </div>
-        <div className="ap2-mini-grid c2">
-          <div className="ap2-field">
-            <label className="ap-label">Rate limit ↓ <span className="ap-label-opt">Mbps</span></label>
-            <input type="text" className="ap-input mono" value={rateDown} onChange={(e) => setRateDown(e.target.value)} placeholder="—" />
-          </div>
-          <div className="ap2-field">
-            <label className="ap-label">Rate limit ↑ <span className="ap-label-opt">Mbps</span></label>
-            <input type="text" className="ap-input mono" value={rateUp} onChange={(e) => setRateUp(e.target.value)} placeholder="—" />
-          </div>
-        </div>
+        <button type="button" className="btn" onClick={() => onOpenBudget?.()}>Open Data Budget →</button>
       </>
     );
 

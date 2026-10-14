@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="theme-color" content="#FDFCFA" />
+<meta name="theme-color" content="#f5f5f2" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="WG Dashboard" />
+<meta name="apple-mobile-web-app-title" content="WG-Quick" />
 <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png" />
 <link rel="manifest" href="/manifest.json" />
 <title>WG-Quick</title>
@@ -17,19 +17,49 @@
   if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
   var a = localStorage.getItem('WG_ACCENT');
   if (a && a !== 'terracotta') document.documentElement.classList.add('accent-' + a);
-  var sc = localStorage.getItem('WG_SOFT_COLORS') === 'true';
-  if (sc) document.documentElement.classList.add('soft-colors');
-  if (localStorage.getItem('WG_ACCENT_TINT') === 'true') document.documentElement.classList.add('accent-tint');
   var mt = document.querySelector('meta[name="theme-color"]');
-  if (mt) mt.setAttribute('content', sc ? (t === 'dark' ? '#14100C' : '#F5EEE2') : (t === 'dark' ? '#0A0A0A' : '#FDFCFA'));
+  if (mt) mt.setAttribute('content', t === 'dark' ? '#08080a' : '#f5f5f2');
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(function () {});
   }
+  /* iOS home-screen "standalone" apps can report an initial containing block
+     that's shorter than the real screen (as if Safari's chrome were still
+     reserving space), which no CSS unit (vh/dvh/svh) or position:fixed+inset
+     sees correctly. window.visualViewport tracks the actual visible area, so
+     drive --app-h from it directly and keep re-measuring after cold launch,
+     since iOS settles onto the correct value a moment after first paint. */
+  function setAppH() {
+    var vv = window.visualViewport;
+    var h = vv ? vv.height : window.innerHeight;
+    document.documentElement.style.setProperty('--app-h', h + 'px');
+  }
+  setAppH();
+  window.addEventListener('resize', setAppH);
+  window.addEventListener('pageshow', setAppH);
+  window.addEventListener('orientationchange', function () { setTimeout(setAppH, 50); setTimeout(setAppH, 300); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) setAppH(); });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', setAppH);
+    window.visualViewport.addEventListener('scroll', setAppH);
+  }
+  window.addEventListener('load', function () {
+    setAppH();
+    requestAnimationFrame(function () { requestAnimationFrame(setAppH); });
+    [50, 150, 300, 600, 1000, 1500].forEach(function (t) { setTimeout(setAppH, t); });
+  });
+  /* Belt-and-braces: even if --app-h is briefly wrong, block rubber-band
+     overscroll of the outer page so a mismeasured edge never reveals blank
+     canvas — only the designated inner scroll containers may pan. */
+  document.addEventListener('touchmove', function (e) {
+    if (!e.target.closest('.m-content, .m-sheet-body, .m-config-pre, .m-raw-pre, .m-log-stream')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
 }());
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --serif: 'Instrument Serif', Georgia, serif;
@@ -92,54 +122,6 @@
   --shadow:      0 1px 3px rgba(0,0,0,0.5), 0 4px 14px rgba(0,0,0,0.4);
   --shadow-sm:   0 1px 2px rgba(0,0,0,0.4);
 }
-/* Soft colors on: swap the plain neutral surfaces for a warm cream/charcoal
-   palette. Accent + status colors are untouched. */
-.soft-colors {
-  --bg: #F5EEE2;
-  --bg-2: #EFE7D8;
-  --card: #FBF6EC;
-  --card-raised: #FFFCF4;
-  --ink: #2A2520;
-  --ink-2: #4A4238;
-  --muted: #8A7F72;
-  --muted-2: #A89C8C;
-  --border: #E6DCC8;
-  --border-strong: #D6C9B0;
-  --field-ink: #2A2520;
-  --field-muted: #8A7F72;
-  --field-border: #E6DCC8;
-}
-[data-theme="dark"].soft-colors {
-  --bg: #14100C;
-  --bg-2: #1C1611;
-  --card: #241D16;
-  --card-raised: #2F2619;
-  --ink: #EFE6D8;
-  --ink-2: #C8BEAE;
-  --muted: #8A7F72;
-  --muted-2: #6B6256;
-  --border: #3A2F24;
-  --border-strong: #4D3E2C;
-  --field-ink: #EFE6D8;
-  --field-muted: #8A7F72;
-  --field-border: #3A2F24;
-}
-
-/* Accent tint (soft colors sub-option): text, numbers and icons pick up shades
-   of the selected accent hue instead of plain neutral gray. Backgrounds,
-   containers, borders and --field-* (input text/borders) are left untouched. */
-.accent-tint {
-  --ink: oklch(from var(--accent) 15% calc(c * 0.85) h);
-  --ink-2: oklch(from var(--accent) 29% calc(c * 0.8) h);
-  --muted: oklch(from var(--accent) 49% calc(c * 0.65) h);
-  --muted-2: oklch(from var(--accent) 64% calc(c * 0.5) h);
-}
-[data-theme="dark"].accent-tint {
-  --ink: oklch(from var(--accent) 95% calc(c * 0.3) h);
-  --ink-2: oklch(from var(--accent) 84% calc(c * 0.4) h);
-  --muted: oklch(from var(--accent) 60% calc(c * 0.55) h);
-  --muted-2: oklch(from var(--accent) 44% calc(c * 0.55) h);
-}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { background: var(--bg); }
 html, body { height: 100%; overscroll-behavior: none; }
@@ -155,10 +137,16 @@ body {
 #root { height: 100%; display: flex; flex-direction: column; }
 
 /* ── App shell ── */
-/* Fixed + inset (rather than vh/dvh, which iOS misreports in home-screen
-   "standalone" mode by reserving room for a Safari toolbar that isn't there)
-   sizes against the real viewport geometry, so it's full-bleed everywhere. */
-.m-app { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--bg); }
+/* An explicit pixel height (--app-h, set from window.visualViewport in the
+   head script) rather than vh/dvh/inset:0 — iOS's home-screen "standalone"
+   mode has repeatedly misreported all of those by reserving room for a
+   Safari toolbar that isn't there. svh is only the pre-JS/no-JS fallback. */
+.m-app {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 100svh;
+  height: var(--app-h, 100svh);
+  display: flex; flex-direction: column; background: var(--bg);
+}
 .m-header {
   flex-shrink: 0;
   padding: calc(var(--safe-top) + 12px) 16px 12px;
@@ -174,12 +162,12 @@ body {
 .m-brand-mark {
   width: 32px; height: 32px;
   background: var(--accent-soft); color: var(--accent);
-  border: 1px solid var(--border); border-radius: 8px;
+  border: 1px solid var(--border); border-radius: 0;
   display: grid; place-items: center; flex-shrink: 0;
 }
 .m-status-pill {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px; border-radius: 99px;
+  padding: 4px 10px; border-radius: 0;
   font-family: var(--mono); font-size: 11px; font-weight: 500;
 }
 .m-status-pill.active   { background: var(--success-soft); color: var(--success); }
@@ -190,7 +178,7 @@ body {
 
 .m-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .m-icon-btn {
-  width: 34px; height: 34px; border-radius: 8px;
+  width: 34px; height: 34px; border-radius: 0;
   background: var(--card); border: 1px solid var(--border);
   display: grid; place-items: center; cursor: pointer; color: var(--ink-2);
   -webkit-tap-highlight-color: transparent;
@@ -261,7 +249,7 @@ body {
 .m-svc-name { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 .m-svc-uptime { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
 .m-btn {
-  flex: 1; height: 38px; border-radius: 9px; border: 1px solid var(--border);
+  flex: 1; height: 38px; border-radius: 0; border: 1px solid var(--border);
   background: var(--bg-2); color: var(--ink); font-family: var(--sans);
   font-size: 13px; font-weight: 500; cursor: pointer; display: flex;
   align-items: center; justify-content: center; gap: 6px;
@@ -288,7 +276,7 @@ body {
 .m-traffic-unit { font-family: var(--mono); font-size: 13px; color: var(--muted); }
 .m-traffic-breakdown { display: flex; gap: 18px; margin-bottom: 10px; }
 .m-legend-item { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
-.m-legend-sq { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.m-legend-sq { width: 7px; height: 7px; border-radius: 0; flex-shrink: 0; }
 .m-range-badge { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 11px; color: var(--success); }
 
 /* ── Budget bar ── */
@@ -296,8 +284,8 @@ body {
 .m-budget-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .m-budget-title { font-size: 13px; font-weight: 500; color: var(--ink); }
 .m-budget-pct { font-family: var(--mono); font-size: 13px; color: var(--muted); }
-.m-budget-bar-bg { height: 8px; background: var(--bg-2); border-radius: 4px; border: 1px solid var(--border); overflow: hidden; }
-.m-budget-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease, background 0.3s; }
+.m-budget-bar-bg { height: 8px; background: var(--bg-2); border-radius: 0; border: 1px solid var(--border); overflow: hidden; }
+.m-budget-bar-fill { height: 100%; border-radius: 0; transition: width 0.6s ease, background 0.3s; }
 .m-budget-foot { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
 /* ── Peers ── */
@@ -308,7 +296,7 @@ body {
 .m-search {
   display: flex; align-items: center; gap: 8px;
   background: var(--card); border: 1px solid var(--field-border);
-  border-radius: 10px; padding: 0 12px; height: 40px;
+  border-radius: 0; padding: 0 12px; height: 40px;
   box-shadow: var(--shadow-sm);
 }
 .m-search svg { flex-shrink: 0; color: var(--muted); }
@@ -321,7 +309,7 @@ body {
 
 .m-peer-list { padding: 0 14px; display: flex; flex-direction: column; gap: 8px; }
 .m-peer-avatar {
-  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  width: 38px; height: 38px; border-radius: 0; flex-shrink: 0;
   background: var(--accent-soft); color: var(--accent);
   display: grid; place-items: center;
   font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
@@ -369,20 +357,20 @@ body {
 @keyframes scrimIn { from { opacity: 0; } to { opacity: 1; } }
 .m-sheet {
   position: relative;
-  width: 100%; background: var(--card); border-radius: 20px 20px 0 0;
+  width: 100%; background: var(--card); border-radius: 0;
   border: 1px solid var(--border); border-bottom: none;
   max-height: 92dvh; display: flex; flex-direction: column;
   animation: slideUp 0.3s cubic-bezier(0.2,0.9,0.3,1);
   will-change: transform;
 }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.m-modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; }
+.m-modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 0; }
 .m-sheet-grab { padding: 10px 0 4px; display: flex; justify-content: center; flex-shrink: 0; }
 .m-sheet-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 4px 20px 12px; flex-shrink: 0; gap: 12px; }
 .m-sheet-title { font-family: var(--serif); font-size: 24px; color: var(--ink); line-height: 1.15; word-break: break-word; }
 .m-sheet-sub { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 3px; }
 .m-sheet-x {
-  width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
+  width: 36px; height: 36px; border-radius: 0; border: 1px solid var(--border);
   background: var(--bg-2); display: grid; place-items: center; cursor: pointer;
   color: var(--ink-2); flex-shrink: 0; -webkit-tap-highlight-color: transparent;
 }
@@ -391,7 +379,7 @@ body {
   flex-shrink: 0; padding: 12px 20px calc(12px + var(--safe-bot));
   border-top: 1px solid var(--border); display: flex; gap: 10px; background: var(--card);
 }
-.m-sheet-foot .m-btn { height: 48px; border-radius: 12px; font-size: 14px; }
+.m-sheet-foot .m-btn { height: 48px; border-radius: 0; font-size: 14px; }
 .m-sheet-divider { height: 1px; background: var(--border); margin: 16px -20px; }
 
 /* ── Forms ── */
@@ -403,7 +391,7 @@ body {
 }
 .m-input {
   width: 100%; padding: 11px 13px; border: 1px solid var(--field-border);
-  border-radius: 10px; background: var(--bg-2); color: var(--field-ink);
+  border-radius: 0; background: var(--bg-2); color: var(--field-ink);
   font-family: var(--sans); font-size: 16px; outline: none;
   transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
 }
@@ -415,7 +403,7 @@ select.m-input { background-image: none; }
 .m-err-text { font-size: 12px; color: var(--danger); margin-top: 5px; }
 .m-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .m-chip {
-  padding: 7px 13px; border-radius: 99px; border: 1px solid var(--border);
+  padding: 7px 13px; border-radius: 0; border: 1px solid var(--border);
   background: var(--bg-2); font-family: var(--sans); font-size: 12.5px; color: var(--ink-2);
   cursor: pointer; -webkit-tap-highlight-color: transparent;
   display: inline-flex; align-items: center; gap: 6px;
@@ -433,7 +421,7 @@ select.m-input { background-image: none; }
 .m-row-btn:active { background: var(--bg-2); }
 .m-row-btn + .m-row-btn { border-top: 1px solid var(--border); }
 .m-row-ic {
-  width: 30px; height: 30px; border-radius: 8px;
+  width: 30px; height: 30px; border-radius: 0;
   background: var(--accent-soft); color: var(--accent);
   display: grid; place-items: center; flex-shrink: 0;
 }
@@ -442,7 +430,7 @@ select.m-input { background-image: none; }
 .m-row-sub { font-size: 11.5px; color: var(--muted); margin-top: 1px; font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .m-row-chev { color: var(--muted-2); flex-shrink: 0; }
 .m-badge {
-  font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 99px;
+  font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 0;
   background: var(--accent-soft); color: var(--accent); flex-shrink: 0;
 }
 .m-badge.warn { background: var(--warn-soft); color: var(--warn); }
@@ -469,8 +457,8 @@ select.m-input { background-image: none; }
   font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--accent); -webkit-tap-highlight-color: transparent;
 }
-.m-pc-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.m-pc-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.35s ease; }
+.m-pc-bar { height: 3px; background: var(--border); border-radius: 0; overflow: hidden; }
+.m-pc-fill { height: 100%; background: var(--accent); border-radius: 0; transition: width 0.35s ease; }
 .m-check-row.pending { color: var(--muted); }
 .m-check-ic.idle { background: var(--bg-2); border: 1px solid var(--border); }
 .m-pc-idle-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted-2); opacity: 0.6; }
@@ -480,7 +468,7 @@ select.m-input { background-image: none; }
   animation: spin 0.8s linear infinite;
 }
 .m-pc-tip {
-  border: 1px solid var(--border); border-radius: 10px; background: var(--card-raised);
+  border: 1px solid var(--border); border-radius: 0; background: var(--card-raised);
   padding: 12px 14px; margin-bottom: 14px; display: flex; gap: 10px; align-items: flex-start;
 }
 .m-pc-tip-ic {
@@ -493,7 +481,7 @@ select.m-input { background-image: none; }
 .m-fab {
   position: fixed; right: 18px;
   bottom: calc(var(--nav-h) + var(--safe-bot) + 18px);
-  width: 54px; height: 54px; border-radius: 18px;
+  width: 54px; height: 54px; border-radius: 0;
   background: var(--ink); color: var(--bg); border: none;
   box-shadow: var(--shadow); display: grid; place-items: center;
   cursor: pointer; z-index: 50; -webkit-tap-highlight-color: transparent;
@@ -510,26 +498,26 @@ select.m-input { background-image: none; }
 }
 .m-confirm {
   width: 100%; max-width: 340px; background: var(--card-raised);
-  border: 1px solid var(--border); border-radius: 18px; padding: 22px 20px;
+  border: 1px solid var(--border); border-radius: 0; padding: 22px 20px;
   box-shadow: var(--shadow); animation: mFadeIn 0.22s cubic-bezier(0.2,0.9,0.3,1);
 }
 .m-confirm-title { font-family: var(--serif); font-size: 21px; color: var(--ink); margin-bottom: 8px; }
 .m-confirm-body { font-size: 13px; color: var(--ink-2); line-height: 1.55; margin-bottom: 18px; }
 .m-confirm-btns { display: flex; gap: 8px; }
-.m-confirm-btns .m-btn { height: 44px; border-radius: 11px; }
+.m-confirm-btns .m-btn { height: 44px; border-radius: 0; }
 
 /* ── QR ── */
 .m-qr-wrap { display: flex; justify-content: center; padding: 16px 0 6px; }
-.m-qr-box { background: #ffffff; padding: 14px; border-radius: 14px; border: 1px solid var(--border); line-height: 0; }
+.m-qr-box { background: #ffffff; padding: 14px; border-radius: 0; border: 1px solid var(--border); line-height: 0; }
 
 /* ── Progress ── */
-.m-prog { height: 8px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-.m-prog-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s ease; }
+.m-prog { height: 8px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 0; overflow: hidden; }
+.m-prog-fill { height: 100%; background: var(--accent); border-radius: 0; transition: width 0.4s ease; }
 
 /* ── Stepper ── */
 .m-stepper {
   display: inline-flex; align-items: center; border: 1px solid var(--field-border);
-  border-radius: 10px; background: var(--bg-2); overflow: hidden;
+  border-radius: 0; background: var(--bg-2); overflow: hidden;
 }
 .m-stepper button {
   width: 42px; height: 42px; border: none; background: none; color: var(--ink);
@@ -548,13 +536,13 @@ select.m-input { background-image: none; }
 .m-config-pre {
   overflow: auto; font-family: var(--mono); font-size: 12px; line-height: 1.6;
   color: var(--ink); background: var(--bg-2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 14px; white-space: pre;
+  border-radius: 0; padding: 12px 14px; white-space: pre;
   -webkit-overflow-scrolling: touch;
 }
 .m-raw-pre {
   overflow: auto; font-family: var(--mono); font-size: 10.5px; line-height: 1.55;
   color: var(--ink-2); background: var(--bg-2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 12px; white-space: pre;
+  border-radius: 0; padding: 10px 12px; white-space: pre;
   max-height: 240px; -webkit-overflow-scrolling: touch;
 }
 
@@ -572,7 +560,7 @@ select.m-input { background-image: none; }
 .m-log-line { display: flex; gap: 8px; padding: 1px 0; animation: logIn 0.3s ease; }
 @keyframes logIn { from { opacity: 0; } to { opacity: 1; } }
 .m-log-time { color: var(--muted-2); white-space: nowrap; flex-shrink: 0; }
-.m-log-lvl { font-size: 9.5px; letter-spacing: 0.08em; padding: 0 4px; border-radius: 3px; height: 16px; line-height: 16px; align-self: center; flex-shrink: 0; text-transform: uppercase; }
+.m-log-lvl { font-size: 9.5px; letter-spacing: 0.08em; padding: 0 4px; border-radius: 0; height: 16px; line-height: 16px; align-self: center; flex-shrink: 0; text-transform: uppercase; }
 .m-log-info .m-log-lvl { background: var(--accent-soft); color: var(--accent); }
 .m-log-warn .m-log-lvl { background: var(--warn-soft); color: var(--warn); }
 .m-log-error .m-log-lvl { background: var(--danger-soft); color: var(--danger); }
@@ -582,7 +570,7 @@ select.m-input { background-image: none; }
 /* ── Toasts ── */
 .m-toast-wrap { position: fixed; top: calc(var(--safe-top) + 70px); left: 12px; right: 12px; z-index: 500; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
 .m-toast {
-  background: var(--card-raised); border: 1px solid var(--border); border-radius: 12px;
+  background: var(--card-raised); border: 1px solid var(--border); border-radius: 0;
   padding: 12px 14px; font-size: 13px; color: var(--ink);
   box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px;
   animation: toastIn 0.3s cubic-bezier(0.2,0.9,0.3,1);
@@ -600,19 +588,19 @@ select.m-input { background-image: none; }
   display: flex; align-items: center; justify-content: center;
   background: var(--bg); padding: 24px;
 }
-.m-login-card { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 32px 28px; box-shadow: var(--shadow); }
+.m-login-card { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: 0; padding: 32px 28px; box-shadow: var(--shadow); }
 .m-login-title { font-family: var(--serif); font-size: 28px; color: var(--ink); margin-bottom: 6px; }
 .m-login-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
 .m-login-input {
   width: 100%; padding: 12px 14px; border: 1px solid var(--field-border);
-  border-radius: 10px; background: var(--bg-2); color: var(--field-ink);
+  border-radius: 0; background: var(--bg-2); color: var(--field-ink);
   font-family: var(--sans); font-size: 16px; outline: none;
   margin-bottom: 12px; transition: border-color 0.15s;
 }
 .m-login-input:focus { border-color: var(--accent); }
 .m-login-err { font-size: 12px; color: var(--danger); margin-bottom: 10px; }
 .m-login-btn {
-  width: 100%; height: 46px; border-radius: 10px; border: none;
+  width: 100%; height: 46px; border-radius: 0; border: none;
   background: var(--ink); color: var(--bg); font-family: var(--sans);
   font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s;
 }
@@ -654,7 +642,7 @@ select.m-input { background-image: none; }
 /* ── Peer filter pills ── */
 .m-filter-row { display: flex; gap: 6px; padding: 0 14px 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .m-filter-row::-webkit-scrollbar { display: none; }
-.m-filter-pill { flex-shrink: 0; padding: 5px 14px; border-radius: 99px; border: 1px solid var(--border); background: var(--card); font-size: 12.5px; color: var(--muted); cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
+.m-filter-pill { flex-shrink: 0; padding: 5px 14px; border-radius: 0; border: 1px solid var(--border); background: var(--card); font-size: 12.5px; color: var(--muted); cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
 .m-filter-pill.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
 /* ── Accent color overrides ── */
@@ -678,14 +666,8 @@ select.m-input { background-image: none; }
 .m-settings-lbl { font-size: 14px; color: var(--ink); }
 .m-settings-sub { font-size: 11.5px; color: var(--muted); font-family: var(--mono); margin-top: 1px; }
 .m-settings-lbl-row { display: flex; align-items: center; }
-.m-soft-preview { display: inline-flex; align-items: center; margin-right: 9px; flex-shrink: 0; }
-.m-soft-preview-swatch { width: 15px; height: 15px; border-radius: 4px; border: 1px solid var(--border-strong); box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
-.m-soft-preview-before { background: #FDFCFA; margin-right: -6px; z-index: 1; }
-.m-soft-preview-after { background: #F5EEE2; }
-[data-theme="dark"] .m-soft-preview-before { background: #0A0A0A; }
-[data-theme="dark"] .m-soft-preview-after { background: #14100C; }
-.m-seg { display: flex; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; padding: 2px; gap: 2px; }
-.m-seg-btn { padding: 5px 12px; border-radius: 6px; border: none; background: none; font-family: var(--mono); font-size: 12px; color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.m-seg { display: flex; background: var(--bg-2); border: 1px solid var(--border); border-radius: 0; padding: 2px; gap: 2px; }
+.m-seg-btn { padding: 5px 12px; border-radius: 0; border: none; background: none; font-family: var(--mono); font-size: 12px; color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .m-seg-btn.on { background: var(--card); color: var(--ink); box-shadow: var(--shadow-sm); }
 .m-seg-btn:disabled { opacity: 0.4; pointer-events: none; }
 .m-swatches { display: flex; gap: 10px; }
@@ -693,11 +675,12 @@ select.m-input { background-image: none; }
 .m-swatch.on { outline-color: var(--ink-2); }
 .m-toggle { position: relative; display: inline-block; width: 46px; height: 27px; flex-shrink: 0; cursor: pointer; }
 .m-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-.m-toggle-slot { position: absolute; inset: 0; background: var(--border); border-radius: 14px; transition: background 0.2s; }
+.m-toggle-slot { position: absolute; inset: 0; background: var(--border); border-radius: 0; transition: background 0.2s; }
 .m-toggle input:checked + .m-toggle-slot { background: var(--accent); }
 .m-toggle-knob { position: absolute; top: 3px; left: 3px; width: 21px; height: 21px; background: white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.2s; pointer-events: none; }
 .m-toggle input:checked ~ .m-toggle-knob { transform: translateX(19px); }
 </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/onauth-theme.css') }}">
 </head>
 <body data-base="{{ request.script_root or '' }}">
 <div id="root"></div>
@@ -2072,8 +2055,8 @@ function BudgetSheet({ onClose, toast, refreshStatus }) {
 /* ─── DynDNS sheet ─── */
 const DYNDNS_PROVIDERS = [
   { id: 'duckdns', label: 'Duck DNS', domainLabel: 'Subdomain', domainHelp: 'Subdomain only — e.g. "myhome" for myhome.duckdns.org', tokenLabel: 'Token', tokenHelp: 'Token from your Duck DNS account page' },
-  { id: 'noip',    label: 'No-IP (soon)', disabled: true },
-  { id: 'dynu',    label: 'Dynu (soon)', disabled: true },
+  { id: 'noip',    label: 'No-IP', domainLabel: 'Hostname', domainHelp: 'Full hostname — e.g. myhome.ddns.net', tokenLabel: 'Credentials', tokenHelp: 'username:password (colon-separated)' },
+  { id: 'dynu',    label: 'Dynu', domainLabel: 'Hostname', domainHelp: 'Full hostname — e.g. myhome.freeddns.org', tokenLabel: 'Credentials', tokenHelp: 'username:password (colon-separated)' },
   { id: 'custom',  label: 'Custom URL' },
 ];
 
@@ -2974,7 +2957,7 @@ function LogsTab({ toast }) {
 }
 
 /* ─── Settings tab ─── */
-function SettingsTab({ theme, setTheme, accent, setAccent, softColors, setSoftColors, accentTint, setAccentTint, chartTweaks, setChartTweaks, onLogout, status, updateInfo, openSheet, onService, askConfirm, svcBusy }) {
+function SettingsTab({ theme, setTheme, accent, setAccent, chartTweaks, setChartTweaks, onLogout, status, updateInfo, openSheet, onService, askConfirm, svcBusy }) {
   const accents = [
     { id: 'terracotta', color: 'oklch(59% 0.15 33)' },
     { id: 'forest',     color: 'oklch(55% 0.11 150)' },
@@ -3016,23 +2999,6 @@ function SettingsTab({ theme, setTheme, accent, setAccent, softColors, setSoftCo
                 <button key={a.id} className={`m-swatch ${accent === a.id ? 'on' : ''}`} style={{ background: a.color }} onClick={() => setAccent(a.id)} aria-label={a.id} />
               ))}
             </div>
-          </div>
-          <div className="m-settings-row">
-            <span className="m-settings-lbl m-settings-lbl-row">
-              <span className="m-soft-preview" aria-hidden="true">
-                <span className="m-soft-preview-swatch m-soft-preview-before" />
-                <span className="m-soft-preview-swatch m-soft-preview-after" />
-              </span>
-              Soft colors
-            </span>
-            <Toggle value={softColors} onChange={setSoftColors} />
-          </div>
-          <div className="m-settings-row">
-            <div>
-              <div className="m-settings-lbl">Accent tint</div>
-              <div className="m-settings-sub">Text &amp; numbers in accent shades, light or dark</div>
-            </div>
-            <Toggle value={accentTint} onChange={setAccentTint} />
           </div>
         </div>
       </div>
@@ -3151,8 +3117,6 @@ function MobileApp() {
   const [tab, setTab] = useState('home');
   const [theme, setTheme] = useState(() => localStorage.getItem('WG_THEME') || 'light');
   const [accent, setAccent] = useState(() => localStorage.getItem('WG_ACCENT') || 'terracotta');
-  const [softColors, setSoftColors] = useState(() => localStorage.getItem('WG_SOFT_COLORS') === 'true');
-  const [accentTint, setAccentTint] = useState(() => localStorage.getItem('WG_ACCENT_TINT') === 'true');
   const [chartTweaks, setChartTweaks] = useState(() => { try { return JSON.parse(localStorage.getItem('WG_CHART_TWEAKS') || '{}'); } catch { return {}; } });
   const [status, setStatus] = useState(null);
   const [rxBps, setRxBps] = useState(0);
@@ -3186,24 +3150,15 @@ function MobileApp() {
   }, [theme]);
   useEffect(() => {
     const el = document.documentElement;
-    // Only strip actual accent-theme classes — "accent-tint" is a separate
-    // toggle and must survive an accent color change.
-    el.className = el.className.replace(/\baccent-(?!tint\b)\S+/g, '').trim();
+    // Only strip actual accent-theme classes
+    el.className = el.className.replace(/\baccent-\S+/g, '').trim();
     if (accent !== 'terracotta') el.classList.add('accent-' + accent);
     localStorage.setItem('WG_ACCENT', accent);
   }, [accent]);
   useEffect(() => {
-    document.documentElement.classList.toggle('soft-colors', softColors);
-    localStorage.setItem('WG_SOFT_COLORS', softColors ? 'true' : 'false');
-  }, [softColors]);
-  useEffect(() => {
-    document.documentElement.classList.toggle('accent-tint', !!accentTint);
-    localStorage.setItem('WG_ACCENT_TINT', accentTint ? 'true' : 'false');
-  }, [accentTint]);
-  useEffect(() => {
     const mt = document.querySelector('meta[name="theme-color"]');
-    if (mt) mt.setAttribute('content', softColors ? (theme === 'dark' ? '#14100C' : '#F5EEE2') : (theme === 'dark' ? '#0A0A0A' : '#FDFCFA'));
-  }, [theme, softColors]);
+    if (mt) mt.setAttribute('content', theme === 'dark' ? '#08080a' : '#f5f5f2');
+  }, [theme]);
   useEffect(() => {
     localStorage.setItem('WG_CHART_TWEAKS', JSON.stringify(chartTweaks));
   }, [chartTweaks]);
@@ -3526,8 +3481,6 @@ function MobileApp() {
           <SettingsTab
             theme={theme} setTheme={setTheme}
             accent={accent} setAccent={setAccent}
-            softColors={softColors} setSoftColors={setSoftColors}
-            accentTint={accentTint} setAccentTint={setAccentTint}
             chartTweaks={chartTweaks} setChartTweaks={setChartTweaks}
             onLogout={authRequired ? handleLogout : null}
             status={status} updateInfo={updateInfo}

@@ -2487,8 +2487,8 @@ def mobile():
 def manifest():
     m = {
         "id": "/mobile",
-        "name": "WireGuard Dashboard",
-        "short_name": "WG Dashboard",
+        "name": "WG-Quick",
+        "short_name": "WG-Quick",
         "description": "WireGuard VPN peer management dashboard",
         "start_url": "/mobile",
         "scope": "/",
@@ -3606,59 +3606,6 @@ def api_fix():
         else:
             errors.append(f"Start failed — check logs: {o[:300]}")
     return jsonify({"ok":len(errors)==0,"actions":actions,"errors":errors,"service_active":service_active()})
-
-_SPEEDTEST_DEFAULT_BYTES = 16_000_000
-_SPEEDTEST_MAX_BYTES = 64_000_000
-_SPEEDTEST_CHUNK_SIZE = 256 * 1024
-_SPEEDTEST_CHUNK = os.urandom(_SPEEDTEST_CHUNK_SIZE)
-
-@app.route("/api/speedtest/ping")
-def api_speedtest_ping():
-    resp = jsonify({"ok": True, "server_ts": round(time.time() * 1000)})
-    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    return resp
-
-@app.route("/api/speedtest/download")
-def api_speedtest_download():
-    try:
-        total = int(request.args.get("bytes", _SPEEDTEST_DEFAULT_BYTES))
-    except Exception:
-        total = _SPEEDTEST_DEFAULT_BYTES
-    total = max(1, min(_SPEEDTEST_MAX_BYTES, total))
-
-    @stream_with_context
-    def generate():
-        sent = 0
-        while sent < total:
-            n = min(_SPEEDTEST_CHUNK_SIZE, total - sent)
-            sent += n
-            yield _SPEEDTEST_CHUNK[:n]
-
-    resp = Response(generate(), mimetype="application/octet-stream")
-    resp.direct_passthrough = True
-    resp.headers["Content-Length"] = str(total)
-    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    resp.headers["X-Speedtest-Bytes"] = str(total)
-    resp.headers["X-Accel-Buffering"] = "no"
-    resp.headers["Content-Encoding"] = "identity"
-    resp.headers["Connection"] = "keep-alive"
-    return resp
-
-@app.route("/api/speedtest/upload", methods=["POST"])
-def api_speedtest_upload():
-    try:
-        total = 0
-        while True:
-            chunk = request.stream.read(_SPEEDTEST_CHUNK_SIZE)
-            if not chunk:
-                break
-            total += len(chunk)
-        resp = jsonify({"ok": True, "bytes": total})
-        resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-        return resp
-    except Exception as e:
-        app.logger.warning("speedtest upload failed: %s", e)
-        return jsonify({"ok": False, "bytes": 0, "error": str(e)})
 
 @app.route("/download/<name>.conf")
 def download_conf(name: str):
