@@ -65,6 +65,7 @@ function App({ tweaks, setTweaks, onLogout }) {
 
   // Per-peer sparklines (values = byte delta per poll cycle)
   const [sparks, setSparks] = uS({});
+  const [pingFailReason, setPingFailReason] = uS('');
   const [avgPingHistory, setAvgPingHistory] = uS(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(AVG_PING_HISTORY_KEY) || 'null');
@@ -305,6 +306,7 @@ function App({ tweaks, setTweaks, onLogout }) {
           .filter(v => Number.isFinite(v) && v >= 0);
         const avg = values.length ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
         setAvgPingHistory(prev => [...prev.slice(1), avg]);
+        setPingFailReason(values.length ? '' : ((results.find(r => r && r.ping_status) || {}).ping_status || 'unreachable'));
         const newGeo = {};
         const newPings = {};
         results.forEach((r, i) => {
@@ -686,7 +688,7 @@ function App({ tweaks, setTweaks, onLogout }) {
         />
         <KPIThroughput currentRx={currentRx} currentTx={currentTx} dataIn={chartTraffic.rx} dataOut={chartTraffic.tx} smooth={tweaks.smoothThroughput} />
         <KPIDataToday total={totalToday} budget={dataBudget} enabled={budgetEnabled} peerBudgets={peerBudgets} peerRows={budgetUsage.peers} loading={!budgetLoaded} onClick={() => setDataDrawerOpen(true)} />
-        <KPIActiveSessions connectedCount={connectedCount} totalCount={peers.length} avgPingHistory={avgPingHistory} />
+        <KPIActiveSessions connectedCount={connectedCount} totalCount={peers.length} avgPingHistory={avgPingHistory} failReason={pingFailReason} />
       </section>
 
       <section className="main-grid">
@@ -1071,7 +1073,7 @@ function KPIDataToday({ total, budget = 50, enabled = true, peerBudgets = {}, pe
   );
 }
 
-function KPIActiveSessions({ connectedCount, totalCount, avgPingHistory }) {
+function KPIActiveSessions({ connectedCount, totalCount, avgPingHistory, failReason = '' }) {
   const avgPing = avgPingHistory.length ? avgPingHistory[avgPingHistory.length - 1] : 0;
 
   return (
@@ -1090,7 +1092,7 @@ function KPIActiveSessions({ connectedCount, totalCount, avgPingHistory }) {
       </div>
       <div className="kpi-foot">
         <span className="mono">{totalCount > 0 ? Math.round((connectedCount / totalCount) * 100) : 0}% online</span>
-        <span className="mono">avg ping {avgPing > 0 ? `${avgPing.toFixed(1)} ms` : '—'}</span>
+        <span className="mono">avg ping {avgPing > 0 ? `${avgPing.toFixed(1)} ms` : (connectedCount > 0 && failReason ? failReason : '—')}</span>
       </div>
     </div>
   );
