@@ -1585,19 +1585,30 @@ def _ping_ip(ip: str) -> Dict[str, Any]:
     except Exception:
         return {"status": "invalid", "ms": None, "out": ""}
     ping_bin = next((p for p in ("/bin/ping", "/usr/bin/ping") if os.path.exists(p)), "ping")
-    args = [ping_bin, "-c", "1", "-W", "1000" if os.uname().sysname == "Darwin" else "1", ip]
+    # Two probes with a 2s wait: the first packet to an idle WireGuard peer is often
+    # consumed by the handshake, so a single 1s probe reports a false timeout.
+    args = [ping_bin, "-c", "2", "-W", "2000" if os.uname().sysname == "Darwin" else "2", ip]
     out = ""
     rc = 1
     try:
-        r = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=2)
+        r = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=6)
         out = r.stdout or ""
         rc = r.returncode
+    except subprocess.TimeoutExpired as e:
+        out = (e.stdout.decode() if isinstance(e.stdout, bytes) else e.stdout) or ""
     except Exception as e:
         out = str(e)
-    if rc != 0 and ping_bin != "ping":
-        out, rc = _sudo(args)
+    if rc != 0 and not re.search(r"time[=<]", out) and ping_bin != "ping":
+        out2, rc2 = _sudo(args)
+        if rc2 == 0 or re.search(r"time[=<]", out2):
+            out, rc = out2, rc2
+        elif not out.strip():
+            out, rc = out2, rc2
     m = re.search(r"time[=<]([\d.]+)\s*ms", out)
     if not m:
+        if re.search(r"not permitted|permission denied|socket", out, re.I):
+            app.logger.warning("ping %s failed: %s", ip, out[-200:])
+            return {"status": "no_permission", "ms": None, "out": out[-300:]}
         return {"status": "timeout" if rc != 0 else "unknown", "ms": None, "out": out[-300:]}
     return {"status": "ok", "ms": round(float(m.group(1)), 1), "out": out[-300:]}
 
