@@ -281,7 +281,7 @@ def local_listening(port: int, proto: str="udp") -> bool:
 
 def ping_ok() -> bool:
     o,c=_run("ping -c1 -W1 1.1.1.1 >/dev/null 2>&1")
-    return c==0
+    return c==0 or _tcp_probe("1.1.1.1", 443, 1.5)[0]
 
 _BG_INTERVAL   = int(os.environ.get("BG_CHECK_INTERVAL", "3600"))   
 _BG_INIT_DELAY = int(os.environ.get("BG_CHECK_DELAY",    "120"))    
@@ -902,13 +902,27 @@ def _record_uptime_sample(active: bool = None) -> None:
         changed = _uptime_append_state(db, "events", "last_sample", "up" if active else "down", now)
         _uptime_flush(db, changed, now)
 
+def _tcp_probe(ip: str, port: int = 443, timeout: float = 2.0) -> Tuple[bool, float]:
+    """TCP connect fallback for hosts where ICMP is blocked or ping lacks CAP_NET_RAW."""
+    import socket
+    t0 = time.time()
+    try:
+        with socket.create_connection((ip, port), timeout=timeout):
+            return True, (time.time() - t0) * 1000.0
+    except OSError:
+        return False, 0.0
+
 def _ping_internet() -> Tuple[bool, float, str]:
-    """Ping the first reachable target; returns (ok, latency_ms, target)."""
+    """Probe the first reachable target (ICMP, then TCP/443); returns (ok, latency_ms, target)."""
     for ip in NET_PING_TARGETS:
         o, c = _run(f"ping -c1 {_PING_WAIT_FLAG} {ip} 2>/dev/null")
         if c == 0:
             m = re.search(r"time[=<]([\d.]+)\s*ms", o)
             return True, float(m.group(1)) if m else 0.0, ip
+    for ip in NET_PING_TARGETS:
+        ok, ms = _tcp_probe(ip)
+        if ok:
+            return True, ms, ip
     return False, 0.0, NET_PING_TARGETS[0] if NET_PING_TARGETS else ""
 
 def _record_net_sample(ok: bool = None, latency_ms: float = None, target: str = "") -> None:
