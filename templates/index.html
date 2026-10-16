@@ -518,7 +518,7 @@ html.theme-switching .theme-toggle-icon {
 }
 .kpi-badge.badge-ok { color: var(--success); }
 .pulse-dot {
-  width: 5px; height: 5px; border-radius: 50%;
+  width: 5px; height: 5px; border-radius: 2px;
   background: var(--success);
   animation: pulse 1.6s infinite;
 }
@@ -587,7 +587,7 @@ html.theme-switching .theme-toggle-icon {
 .svc-stat-btn .svc-stat-label { display: inline-flex; align-items: center; gap: 3px; }
 .svc-stat-btn:hover .svc-stat-label { color: var(--accent); }
 .svc-stat-dot {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: 6px; height: 6px; border-radius: 2px;
   background: var(--warn); flex-shrink: 0;
   box-shadow: 0 0 0 2px var(--warn-soft);
   animation: dotPop 0.22s ease-out;
@@ -632,7 +632,7 @@ html.theme-switching .theme-toggle-icon {
 .svc-settings-btn:hover .svc-settings-chev { transform: translateX(2px); }
 .svc-settings-btn:hover > svg:first-child { transform: rotate(45deg); }
 .svc-update-dot {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: 6px; height: 6px; border-radius: 2px;
   background: var(--accent);
   flex-shrink: 0;
 }
@@ -748,7 +748,7 @@ html.theme-switching .theme-toggle-icon {
 @keyframes skelShimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 .skel { display: inline-block; height: 11px; border-radius: 0; background: linear-gradient(90deg, var(--border) 25%, color-mix(in oklch, var(--border) 60%, var(--card)) 50%, var(--border) 75%); background-size: 200% 100%; animation: skelShimmer 1.4s ease-in-out infinite; vertical-align: middle; }
 .skel-sub { height: 9px; border-radius: 0; }
-.skel-dot { width: 7px; height: 7px; border-radius: 50%; }
+.skel-dot { width: 7px; height: 7px; border-radius: 2px; }
 .skel-avatar { width: 28px; height: 28px; border-radius: 0; flex-shrink: 0; }
 /* DATA TODAY placeholder while we don't yet know whether a cap exists. Holds the
    tile's height instead of predicting gauge or bar. */
@@ -942,7 +942,7 @@ html.theme-switching .theme-toggle-icon {
   border: 1px solid var(--border);
   border-radius: 0;
 }
-.up-event-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.up-event-dot { width: 8px; height: 8px; border-radius: 2px; margin-top: 4px; flex-shrink: 0; }
 .up-event.is-down .up-event-dot { background: var(--danger); }
 .up-event.is-gap .up-event-dot { background: var(--muted); opacity: 0.5; }
 .up-event.is-gap .up-event-title { color: var(--ink-2); }
@@ -1064,7 +1064,7 @@ html.theme-switching .theme-toggle-icon {
 @keyframes glowPulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
 .pc-summary { display: flex; gap: 14px; margin-top: 12px; font-family: var(--mono); font-size: 10.5px; }
 .pc-stat { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); }
-.pc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.pc-dot { width: 6px; height: 6px; border-radius: 2px; background: var(--muted); }
 .pc-ok .pc-dot { background: var(--success); }
 .pc-warn .pc-dot { background: var(--warn); }
 .pc-fail .pc-dot { background: var(--danger); }
@@ -1078,7 +1078,7 @@ html.theme-switching .theme-toggle-icon {
 .pc-step.result-ok .pc-marker { border-color: var(--success); color: var(--success); background: var(--success-soft); }
 .pc-step.result-warn .pc-marker { border-color: var(--warn); color: var(--warn); background: var(--warn-soft); }
 .pc-step.result-fail .pc-marker { border-color: var(--danger); color: var(--danger); background: var(--danger-soft); }
-.pc-idle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); opacity: 0.5; }
+.pc-idle-dot { width: 6px; height: 6px; border-radius: 2px; background: var(--muted); opacity: 0.5; }
 .pc-spinner { width: 12px; height: 12px; border: 2px solid color-mix(in oklab, var(--accent) 25%, transparent); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pingFadeBlur { from { opacity: 0; filter: blur(8px); } to { opacity: 1; filter: blur(0); } }
@@ -1133,7 +1133,7 @@ html.theme-switching .theme-toggle-icon {
 .dd-push-info { flex: 1; min-width: 0; }
 .dd-code { font-family: var(--mono); background: var(--bg-2); padding: 0 3px; border-radius: 0; }
 .dd-foot-note { font-size: 12px; color: var(--warn); font-family: var(--mono); display: inline-flex; align-items: center; gap: 7px; }
-.dd-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+.dd-dot { width: 6px; height: 6px; border-radius: 2px; background: var(--muted); flex-shrink: 0; }
 .dd-dot.ok { background: var(--success); } .dd-dot.warn { background: var(--warn); } .dd-dot.fail { background: var(--danger); }
 .dd-field-status { display: flex; align-items: center; gap: 7px; margin-top: 8px; font-family: var(--mono); font-size: 10.5px; color: var(--muted); line-height: 1.4; min-width: 0; }
 .dd-field-status > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1200,7 +1200,7 @@ html.theme-switching .theme-toggle-icon {
 .legend-dot {
   display: inline-block;
   width: 7px; height: 7px;
-  border-radius: 50%;
+  border-radius: 2px;
 }
 .range-pills {
   position: relative;
@@ -1434,7 +1434,7 @@ html.theme-switching .theme-toggle-icon {
   width: 20px; height: 20px;
 }
 .status-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0;
 }
 .status-connected .status-dot {}
 
@@ -1453,7 +1453,7 @@ html.theme-switching .theme-toggle-icon {
   transform: translateY(-100%);
 }
 .status-tip-val { display: inline-flex; align-items: center; gap: 6px; }
-.status-tip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.status-tip-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
 @media (prefers-reduced-motion: reduce) { .status-tip { transition: opacity 0.12s ease; } }
 
 .peer-name-cell { display: flex; align-items: center; gap: 10px; }
@@ -1964,7 +1964,7 @@ html.theme-switching .theme-toggle-icon {
 .coll.open .coll-icon { background: var(--accent-soft); border-color: color-mix(in oklab, var(--accent) 40%, var(--border)); color: var(--accent); }
 .coll-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .coll-title { font-size: 13px; font-weight: 500; color: var(--ink); display: flex; align-items: center; gap: 7px; line-height: 1.2; }
-.coll-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; box-shadow: 0 0 0 3px var(--accent-soft); }
+.coll-dot { width: 6px; height: 6px; border-radius: 2px; background: var(--accent); flex-shrink: 0; box-shadow: 0 0 0 3px var(--accent-soft); }
 .coll-sum { font-family: var(--mono); font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .coll.open .coll-sum { color: var(--muted-2); }
 .coll-chev { color: var(--muted); flex-shrink: 0; transition: transform 0.22s ease; }
@@ -2054,7 +2054,7 @@ html:not([data-theme="dark"]) .coll.open .ap-input:focus { background: var(--car
 @keyframes dotPop { 0% { opacity: 0; transform: scale(0.3); } 65% { transform: scale(1.25); } 100% { opacity: 1; transform: scale(1); } }
 .drawer-tab-dot {
   width: 6px; height: 6px;
-  border-radius: 50%;
+  border-radius: 2px;
   background: var(--warn);
   flex-shrink: 0;
   box-shadow: 0 0 0 2px var(--warn-soft);
@@ -2085,7 +2085,7 @@ html:not([data-theme="dark"]) .coll.open .ap-input:focus { background: var(--car
   border-color: color-mix(in oklch, var(--warn) 30%, transparent);
 }
 .dns-note-warn code { background: color-mix(in oklch, var(--warn) 20%, transparent); color: var(--warn); }
-.dns-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); margin-right: 5px; vertical-align: middle; }
+.dns-dot { display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--border-strong); margin-right: 5px; vertical-align: middle; }
 .dns-dot.on { background: var(--success); box-shadow: 0 0 0 3px color-mix(in oklch, var(--success) 18%, transparent); animation: dnsPulse 2s ease-in-out infinite; }
 @keyframes dnsPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
 .dns-summary { display: flex; gap: 18px; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
@@ -2101,7 +2101,7 @@ html:not([data-theme="dark"]) .coll.open .ap-input:focus { background: var(--car
 .peer-name { display: flex; align-items: center; gap: 5px; }
 .peer-draft-dot {
   width: 6px; height: 6px; flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: 2px;
   background: var(--warn);
   box-shadow: 0 0 0 2px var(--warn-soft);
   animation: dotPop 0.22s ease-out;
@@ -2313,7 +2313,7 @@ html:not([data-theme="dark"]) .coll.open .ap-input:focus { background: var(--car
 .tm-toptag-mono { color: var(--tm-muted); font-variant-numeric: tabular-nums; }
 .tm-tag-dot {
   display: inline-block;
-  width: 5px; height: 5px; border-radius: 50%;
+  width: 5px; height: 5px; border-radius: 2px;
   background: var(--tm-green);
   box-shadow: 0 0 4px rgba(119, 202, 154, 0.42);
   flex-shrink: 0;
@@ -2378,7 +2378,7 @@ html:not([data-theme="dark"]) .coll.open .ap-input:focus { background: var(--car
 .tm-log-meta.tm-mono { font-variant-numeric: tabular-nums; }
 .tm-livedot {
   display: inline-block;
-  width: 5px; height: 5px; border-radius: 50%;
+  width: 5px; height: 5px; border-radius: 2px;
   background: var(--tm-green);
   animation: tmLivePulse 1.4s infinite;
 }
@@ -3363,7 +3363,7 @@ html:not([data-theme="dark"]) .coll.open .ap-input:focus { background: var(--car
 .login-status-dot {
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: 2px;
   flex-shrink: 0;
 }
 .login-status-dot.ok {
@@ -3517,7 +3517,7 @@ html:not([data-theme="dark"]) .coll.open .ap-input:focus { background: var(--car
 .toast-dsc  { font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; white-space: pre-line; }
 .toast-stats { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
 .toast-stat  { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--ink-2); }
-.toast-stat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.toast-stat-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
 .toast-action-row { padding: 0 11px 10px 42px; }
 .toast-action-btn {
   display: inline-flex; align-items: center; gap: 5px;

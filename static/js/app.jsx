@@ -301,7 +301,7 @@ function App({ tweaks, setTweaks, onLogout }) {
         );
         if (cancelled) return;
         const values = results
-          .map(r => Number(r && r.ping_ms))
+          .map(r => (r && r.ping_ms != null ? Number(r.ping_ms) : NaN))
           .filter(v => Number.isFinite(v) && v >= 0);
         const avg = values.length ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
         setAvgPingHistory(prev => [...prev.slice(1), avg]);
@@ -309,7 +309,7 @@ function App({ tweaks, setTweaks, onLogout }) {
         const newPings = {};
         results.forEach((r, i) => {
           if (!r) return;
-          const ping = Number(r.ping_ms);
+          const ping = r.ping_ms != null ? Number(r.ping_ms) : NaN;
           if (Number.isFinite(ping) && ping >= 0) newPings[connectedPeerNames[i]] = ping;
           if (!r.ok || !r.name) return;
           const loc = r.location || {};
@@ -963,7 +963,22 @@ function RangePills({ options, value, onChange }) {
 }
 
 function KPIThroughput({ currentRx, currentTx, dataIn, dataOut, smooth = false }) {
-  const miniData = dataIn.map((v, i) => v + (dataOut[i] || 0));
+  // Average raw samples into fixed buckets, then smooth lightly, so the tile
+  // shows the trend instead of every individual spike.
+  const miniData = uM(() => {
+    const raw = dataIn.map((v, i) => v + (dataOut[i] || 0));
+    const N = 32;
+    const size = Math.max(1, raw.length / N);
+    const buckets = [];
+    for (let b = 0; b < N && b * size < raw.length; b++) {
+      const seg = raw.slice(Math.floor(b * size), Math.max(Math.floor(b * size) + 1, Math.floor((b + 1) * size)));
+      buckets.push(seg.reduce((s, v) => s + v, 0) / seg.length);
+    }
+    return buckets.map((_, i) => {
+      const w = buckets.slice(Math.max(0, i - 1), i + 2);
+      return w.reduce((s, v) => s + v, 0) / w.length;
+    });
+  }, [dataIn, dataOut]);
   const total = currentRx + currentTx;
   return (
     <div className="kpi-tile">
@@ -976,7 +991,7 @@ function KPIThroughput({ currentRx, currentTx, dataIn, dataOut, smooth = false }
           <span className="kpi-unit">{window.WG.formatRate(total).split(' ')[1]}</span>
         </div>
         <div className="kpi-mini">
-          <MiniBars data={miniData} width={140} height={40} color="var(--accent)" smooth={smooth} slots={20} format={v => window.WG.formatRate(v)} />
+          <Sparkline data={miniData} width={140} height={40} color="var(--accent)" zeroBase format={v => window.WG.formatRate(v)} />
         </div>
       </div>
       <div className="kpi-foot">

@@ -1585,7 +1585,7 @@ def _ping_ip(ip: str) -> Dict[str, Any]:
     except Exception:
         return {"status": "invalid", "ms": None, "out": ""}
     ping_bin = next((p for p in ("/bin/ping", "/usr/bin/ping") if os.path.exists(p)), "ping")
-    args = [ping_bin, "-c", "1", "-W", "1", ip]
+    args = [ping_bin, "-c", "1", "-W", "1000" if os.uname().sysname == "Darwin" else "1", ip]
     out = ""
     rc = 1
     try:

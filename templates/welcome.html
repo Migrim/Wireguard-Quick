@@ -159,7 +159,7 @@ body {
 
 .rail-foot { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .rail-status { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 10px; color: var(--muted); }
-.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 0 color-mix(in oklab, var(--success) 50%, transparent); animation: pulse 1.8s infinite; }
+.live-dot { width: 6px; height: 6px; border-radius: 2px; background: var(--success); box-shadow: 0 0 0 0 color-mix(in oklab, var(--success) 50%, transparent); animation: pulse 1.8s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--success) 45%, transparent); } 70% { box-shadow: 0 0 0 5px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
 .rail-status .live-dot { animation: none; box-shadow: none; }
 .theme-btn {
@@ -206,7 +206,7 @@ body {
   padding: 18px 44px 22px; gap: 16px;
 }
 .dots { display: flex; gap: 7px; }
-.dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); transition: all 0.25s; cursor: pointer; }
+.dots i { width: 7px; height: 7px; border-radius: 2px; background: var(--border-strong); transition: all 0.25s; cursor: pointer; }
 .dots i.on { background: var(--accent); width: 22px; border-radius: 0; }
 .foot-btns { display: flex; gap: 9px; }
 .btn {
@@ -306,7 +306,7 @@ body {
 .pr-hs { font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-align: right; }
 .pr-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--success); font-weight: 500; }
 .pr-off .pr-pill { color: var(--muted); font-weight: 400; }
-.pr-sdot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+.pr-sdot { width: 7px; height: 7px; border-radius: 2px; background: var(--success); }
 .pr-on .pr-sdot { box-shadow: 0 0 0 0 color-mix(in oklab, var(--success) 60%, transparent); animation: pulse 1.6s infinite; }
 .pr-off .pr-sdot { background: var(--muted-2); }
 

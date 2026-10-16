@@ -479,13 +479,13 @@ function ThroughputChart({ samples = [], width: widthProp = 900, height = 280, a
 // ============================================================
 // Sparkline — tiny live chart for peer rows
 // ============================================================
-function Sparkline({ data, width = 120, height = 32, color = 'var(--accent)', active = true, format }) {
+function Sparkline({ data, width = 120, height = 32, color = 'var(--accent)', active = true, format, zeroBase = false }) {
   const uid = useRef(`sp-${Math.random().toString(36).slice(2)}`).current;
   const [hover, setHover] = useState(null); // { i }
   const n = data.length;
   if (n < 2) return <svg style={{ width, height, display: 'block' }} />;
   const max = Math.max(...data, 0.01);
-  const min = Math.min(...data);
+  const min = zeroBase ? 0 : Math.min(...data);
   const range = max - min || 1;
   const pts = data.map((v, i) => {
     const x = (i / (n - 1)) * (width - 2) + 1;

@@ -172,7 +172,7 @@ body {
 }
 .m-status-pill.active   { background: var(--success-soft); color: var(--success); }
 .m-status-pill.inactive { background: var(--danger-soft);  color: var(--danger); }
-.m-status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.m-status-dot { width: 6px; height: 6px; border-radius: 2px; background: currentColor; }
 .m-status-pill.active .m-status-dot { animation: mpulse 1.8s infinite; }
 @keyframes mpulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
 
@@ -225,7 +225,7 @@ body {
 .m-nav-btn svg { width: 22px; height: 22px; stroke: currentColor; }
 .m-nav-dot {
   position: absolute; top: 8px; left: calc(50% + 8px);
-  width: 7px; height: 7px; border-radius: 50%;
+  width: 7px; height: 7px; border-radius: 2px;
   background: var(--accent); border: 1.5px solid var(--card);
 }
 
@@ -316,7 +316,7 @@ body {
 }
 .m-peer-avatar.offline { background: var(--border); color: var(--muted); }
 .m-peer-avatar.paused { background: var(--warn-soft); color: var(--warn); }
-.m-peer-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.m-peer-status-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
 .m-peer-status-dot.online { background: var(--success); }
 .m-peer-status-dot.offline { background: var(--muted-2); }
 .m-peer-status-dot.paused { background: var(--warn); animation: mpulse 1.4s steps(1) infinite; }
@@ -461,7 +461,7 @@ select.m-input { background-image: none; }
 .m-pc-fill { height: 100%; background: var(--accent); border-radius: 0; transition: width 0.35s ease; }
 .m-check-row.pending { color: var(--muted); }
 .m-check-ic.idle { background: var(--bg-2); border: 1px solid var(--border); }
-.m-pc-idle-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted-2); opacity: 0.6; }
+.m-pc-idle-dot { width: 5px; height: 5px; border-radius: 2px; background: var(--muted-2); opacity: 0.6; }
 .m-pc-spin {
   width: 11px; height: 11px; border-radius: 50%;
   border: 2px solid var(--accent-soft); border-top-color: var(--accent);
